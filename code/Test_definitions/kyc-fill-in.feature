@@ -144,17 +144,6 @@ Feature: CAMARA Know Your Customer Fill-in API, vwip - Operation kycFillin
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @kyc-fill-in_kycFillin_400.03_unknown_property
-  Scenario: Request body contains a property not declared in the schema
-    Given the request body includes a property that is not declared in the schema at "#/components/schemas/KycFillinRequest"
-    When the request "kycFillin" is sent
-    Then the response status code is 400
-    And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 400
-    And the response property "$.code" is "INVALID_ARGUMENT"
-    And the response property "$.message" contains a user friendly text
-
   @kyc-fill-in_kycFillin_400.06_invalid_x-correlator
   Scenario: Invalid x-correlator header
     Given the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
@@ -164,6 +153,22 @@ Feature: CAMARA Know Your Customer Fill-in API, vwip - Operation kycFillin
     And the response property "$.status" is 400
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
+
+  @kyc-fill-in_kycFillin_400.09_request_body_strictness
+  Scenario Outline: Undeclared property in request body
+    Given the request body is set to a valid request body
+    And the request body includes the property "<undeclared_property>" which is not declared in the schema at "#/components/schemas/KycFillinRequest"
+    When the request "kycFillin" is sent
+    Then the response status code is 400
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+    Examples:
+      | undeclared_property  |
+      | $.undeclaredProperty |
 
     # Generic 401 errors
 
